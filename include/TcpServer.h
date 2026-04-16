@@ -2,7 +2,7 @@
 
 #include "noncapyable.h"
 
-class TcpServer : noncopyable { 
+class TcpServer : noncopyable {
 public:
 private:
 };

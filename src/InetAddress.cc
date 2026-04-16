@@ -55,6 +55,6 @@ uint16_t InetAddress::toPort() const {
     return 0;
 }
 
-sockaddr const *InetAddress::getSockAddr() const { 
+sockaddr const *InetAddress::getSockAddr() const {
     return reinterpret_cast<sockaddr const *>(&_addr);
 }

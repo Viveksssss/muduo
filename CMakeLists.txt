@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED on)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)  # -fPIC，动态库必需
 
-add_compile_options(-g)
+add_compile_options(-g -O2)
 
 # 动态库
 aux_source_directory(./src SRC_LIST)

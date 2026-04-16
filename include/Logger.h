@@ -131,6 +131,9 @@ void log(log_level lev,
     auto format
         = std::vformat(fmt.format().get(), std::make_format_args(args...));
     details::output_log(lev, std::move(format), loc);
+    if (lev == log_level::fatal) {
+        std::abort();
+    }
 }
 
 #define _FUNCTION(name)                                                        \

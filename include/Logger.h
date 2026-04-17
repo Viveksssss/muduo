@@ -39,16 +39,16 @@ inline log_level log_level_from_name(std::string const &name) {
 #if (__linux__) || defined(__APPLE__)
 inline constexpr char k_level_ansi_colors[(std::uint8_t)log_level::fatal + 1][8]
     = {
-        "\E[37m",
-        "\E[35m",
-        "\E[32m",
-        "\E[34m",
-        "\E[33m",
-        "\E[31m",
-        "\E[31;1m",
+        "\033[37m",
+        "\033[35m",
+        "\033[32m",
+        "\033[34m",
+        "\033[33m",
+        "\033[31m",
+        "\033[31;1m",
 };
 
-inline constexpr char k_reset_ansi_color[4] = "\E[m";
+inline constexpr char k_reset_ansi_color[4] = "\033[m";
 # define LOG_IF_HAS_ANSI_COLORS(x) x
 #else
 # define LOG_IF_HAS_ANSI_COLORS(x) x
@@ -147,10 +147,10 @@ void log(log_level lev,
 FOREACH_LOG_LEVEL(_FUNCTION)
 #undef _FUNCTION
 
-static void set_log_level(log_level lev) {
+static inline void set_log_level(log_level lev) {
     details::g_max_level = lev;
 }
 
-static void set_log_file(std::string const &path) {
+static inline void set_log_file(std::string const &path) {
     details::g_log_file = std::ofstream(path, std::ios::app);
 }

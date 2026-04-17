@@ -8,6 +8,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)  # -fPIC，动态库必需
 
 add_compile_options(-g -O2)
 
+
 # 动态库
 aux_source_directory(./src SRC_LIST)
 add_library(muduo SHARED ${SRC_LIST})
@@ -18,3 +19,4 @@ target_include_directories(muduo PRIVATE ${CMAKE_SOURCE_DIR}/include)
 add_executable(muduo_server ${SRC_LIST} main.cpp)
 target_link_libraries(muduo_server PRIVATE muduo)
 target_include_directories(muduo_server PRIVATE ${CMAKE_SOURCE_DIR}/include)
+target_compile_options(muduo_server PRIVATE -Wall -Wextra -Werror -pedantic -Wconversion -Wunused)

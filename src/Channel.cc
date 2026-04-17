@@ -20,14 +20,12 @@ Channel::~Channel() { }
 
 /* 当channel的fd的events更新之后,更新poller中的channel的状态 */
 void Channel::update() {
-    // TODO:
-    // _loop->updateChannel(this);
+    _loop->updateChannel(this);
 }
 
 /* 在poller中移除channel */
 void Channel::remove() {
-    // TODO:
-    // _loop->removeChannel(this);
+    _loop->removeChannel(this);
 }
 
 void Channel::handleEvent(Timestamp receiveTime) {

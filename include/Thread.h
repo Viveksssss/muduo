@@ -18,19 +18,19 @@ public:
     void start();
     void join();
 
-    bool started() const {
+    __attribute__((always_inline)) bool started() const {
         return _started;
     }
 
-    pid_t tid() const {
+    __attribute__((always_inline)) pid_t tid() const noexcept{
         return _tid;
     }
 
-    std::string const &name() const {
+    __attribute__((always_inline)) std::string const &name() const {
         return _name;
     }
 
-    static uint32_t numCreated() {
+    __attribute__((always_inline)) static uint32_t numCreated() {
         return _numCreated.load();
     }
 

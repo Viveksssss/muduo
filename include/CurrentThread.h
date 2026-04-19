@@ -11,7 +11,7 @@ extern thread_local int t_cachedTid;
 
 void cacheTid();
 
-inline int tid() {
+__attribute__((always_inline)) inline int tid() {
     if (t_cachedTid == 0) [[unlikely]] {
         cacheTid();
     }

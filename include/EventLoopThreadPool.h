@@ -19,15 +19,15 @@ public:
 
     std::vector<EventLoop *> getAllLoops();
 
-    void setThreadNum(int numThreads) {
+    __attribute__((always_inline)) void setThreadNum(int numThreads) {
         _numThreads = numThreads;
     }
 
-    bool started() const {
+    __attribute__((always_inline)) bool started() const {
         return _started;
     }
 
-    std::string const &name() const {
+    __attribute__((always_inline)) std::string const &name() const {
         return _name;
     }
 

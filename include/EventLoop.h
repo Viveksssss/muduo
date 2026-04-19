@@ -19,7 +19,7 @@ public:
     void loop();
     void quit();
 
-    Timestamp pollReturnTime() const {
+    __attribute__((always_inline)) Timestamp pollReturnTime() const {
         return _pollReturnTime;
     }
 
@@ -31,7 +31,7 @@ public:
     void removeChannel(Channel *channel);
     bool hasChannel(Channel *channel);
 
-    bool isInLoopThread() const {
+    __attribute__((always_inline)) bool isInLoopThread() const {
         return _threadId == CurrentThread::tid();
     };
 

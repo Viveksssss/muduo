@@ -34,7 +34,7 @@ EventLoop::EventLoop()
     , _pendingFunctors()
     , _callingPendingFunctors(false)
     , _mutex() {
-    log_debug("EventLoop created {} in thread %d", static_cast<void *>(this),
+    log_trace("EventLoop created {} in thread %d", static_cast<void *>(this),
         _threadId);
     if (t_loopInThisThread) {
         log_fatal("Another EventLoop {} exists in this thread {}",

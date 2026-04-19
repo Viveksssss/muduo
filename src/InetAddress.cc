@@ -1,6 +1,7 @@
 #include <arpa/inet.h>
 #include <cstring>
 #include <InetAddress.h>
+#include <netinet/in.h>
 #include <stdexcept>
 #include <sys/socket.h>
 
@@ -57,4 +58,8 @@ uint16_t InetAddress::toPort() const {
 
 sockaddr const *InetAddress::getSockAddr() const {
     return reinterpret_cast<sockaddr const *>(&_addr);
+}
+
+void InetAddress::setSockAddrInet6(sockaddr_in6 const &addr) {
+    _addr._addr6 = addr;
 }

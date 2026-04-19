@@ -23,39 +23,39 @@ public:
     void handleEvent(Timestamp receiveTime);
 
     /* 设置回调 */
-    void setReadCallback(ReadEventCallback cb) {
+    __always_inline void setReadCallback(ReadEventCallback cb) {
         _readCallback = std::move(cb);
     }
 
-    void setWriteCallback(EventCallback cb) {
+    __always_inline void setWriteCallback(EventCallback cb) {
         _writeCallback = std::move(cb);
     }
 
-    void setCloseCallback(EventCallback cb) {
+    __always_inline void setCloseCallback(EventCallback cb) {
         _closeCallback = std::move(cb);
     }
 
-    void setErrorCallback(EventCallback cb) {
+    __always_inline void setErrorCallback(EventCallback cb) {
         _errorCallback = std::move(cb);
     }
 
-    void tie(std::shared_ptr<void> const &tie) {
+    __always_inline void tie(std::shared_ptr<void> const &tie) {
         _tie = tie;
     }
 
-    int fd() const {
+    __always_inline int fd() const noexcept {
         return _fd;
     }
 
-    int events() const {
+    __always_inline int events() const noexcept {
         return _events;
     }
 
-    void set_revents(int revt) {
+    __always_inline void set_revents(int revt) {
         _revents = revt;
     }
 
-    bool isNoneEvent() const {
+    __always_inline bool isNoneEvent() const noexcept {
         return _events == _noneEvent;
     }
 
@@ -80,23 +80,23 @@ public:
         update();
     }
 
-    bool isWriting() const {
+    __always_inline bool isWriting() const noexcept {
         return (_events & _writeEvent) != 0;
     }
 
-    bool isReading() const {
+    __always_inline bool isReading() const noexcept {
         return (_events & _readEvent) != 0;
     }
 
-    int index() {
+    __always_inline int index() const noexcept {
         return _index;
     }
 
-    void set_index(int idx) {
+    __always_inline void set_index(int idx) {
         _index = idx;
     }
 
-    EventLoop *ownerLoop() {
+    __always_inline EventLoop *ownerLoop() const noexcept {
         return _loop;
     }
 

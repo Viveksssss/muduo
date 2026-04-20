@@ -1,13 +1,14 @@
 #pragma once
 
-#include "Buffer.h"
-#include "InetAddress.h"
 #include <atomic>
+#include <Buffer.h>
 #include <Callbacks.h>
+#include <InetAddress.h>
 #include <memory>
 #include <noncapyable.h>
 #include <string>
 #include <sys/types.h>
+#include <Timestamp.h>
 
 class EventLoop;
 class Channel;
@@ -18,6 +19,22 @@ class TcpConnection : noncopyable,
 public:
     TcpConnection(EventLoop *loop, std::string const &name, int sockfd,
         InetAddress const &localAddr, InetAddress const &peerAddr);
+
+    ~TcpConnection();
+
+    void send(std::string const &msg);
+
+    void shutdown();
+
+    void forceClose();
+
+    void stopRead();
+
+    void startRead();
+
+    void connectEstablished();
+
+    void connectDestroyed();
 
     __attribute__((always_inline)) std::string const &name() {
         return _name;
@@ -43,33 +60,41 @@ public:
         return _state == State::Disconnected;
     }
 
-    void send(void const *message, int len);
-
-    void shutdown();
-
-    void forceClose();
-
-    void setConnectionCallback(ConnectionCallback const &cb) {
+    __attribute__((always_inline)) void setConnectionCallback(
+        ConnectionCallback const &cb) {
         _connectionCallback = cb;
     }
 
-    void setMessageCallback(MessageCallback const &cb) {
+    __attribute__((always_inline)) void setMessageCallback(
+        MessageCallback const &cb) {
         _messageCallback = cb;
     }
 
-    void setCloseCallback(CloseCallback const &cb) {
+    __attribute__((always_inline)) void setCloseCallback(
+        CloseCallback const &cb) {
         _closeCallback = cb;
     }
 
-    void setWriteCompleteCallback(WriteCompleteCallback const &cb) {
+    __attribute__((always_inline)) void setWriteCompleteCallback(
+        WriteCompleteCallback const &cb) {
         _writeCompleteCallback = cb;
     }
 
-    void setHighWaterMarkCallback(HighWaterMarkCallback const &cb) {
+    __attribute__((always_inline)) void setHighWaterMarkCallback(
+        HighWaterMarkCallback const &cb, size_t mark) {
         _highWaterMarkCallback = cb;
+        _highWaterMark = mark;
     }
 
-    void connectDestroyed();
+private:
+    void handleRead(Timestamp receiveTime);
+    void handleWrite();
+    void handleClose();
+    void handleError();
+
+    void sendInLoop(void const *, size_t);
+    void shutdownInLoop();
+    void forceCloseInLoop();
 
 private:
     enum class State : uint8_t {
@@ -86,6 +111,7 @@ private:
     std::unique_ptr<Channel> _channel;
     InetAddress const _localAddr;
     InetAddress const _peerAddr;
+    bool _pausedByHighWaterMark;
 
     ConnectionCallback _connectionCallback;
     MessageCallback _messageCallback;
@@ -95,5 +121,5 @@ private:
     size_t _highWaterMark;
 
     Buffer _inputBuffer;
-    Buffer _outputBUffer;
+    Buffer _outputBuffer;
 };

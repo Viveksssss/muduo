@@ -49,7 +49,9 @@ public:
     /* 从fd读取数据 */
     ssize_t readFd(int fd, int *saveErrno);
 
-private:
+    /* 往fd写入数据 */
+    ssize_t writeFd(int fd, int *saveErrno);
+
     __attribute__((__always_inline__)) char *begin() noexcept {
         return _buffer.data();
     }
@@ -103,6 +105,7 @@ private:
         assert(writeableBytes() >= len);
     }
 
+private:
     /*
         | prepend | read | write |
         | prepend    |     len      |

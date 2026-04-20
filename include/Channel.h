@@ -41,6 +41,7 @@ public:
 
     __always_inline void tie(std::shared_ptr<void> const &tie) {
         _tie = tie;
+        _tied = true;
     }
 
     __always_inline int fd() const noexcept {
@@ -72,6 +73,11 @@ public:
 
     void disableWriting() {
         _events &= ~_writeEvent;
+        update();
+    }
+
+    void disableReading() {
+        _events &= ~_readEvent;
         update();
     }
 

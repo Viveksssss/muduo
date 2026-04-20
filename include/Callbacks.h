@@ -8,10 +8,10 @@ class Buffer;
 class TcpConnection;
 
 using TcpConnectionPtr = std::shared_ptr<TcpConnection>;
-using ConnectionCallback = std::function<void(TcpConnection const &)>;
-using CloseCallback = std::function<void(TcpConnection const &)>;
-using WriteCompleteCallback = std::function<void(TcpConnection const &)>;
+using ConnectionCallback = std::function<void(TcpConnectionPtr const &)>;
+using CloseCallback = std::function<void(TcpConnectionPtr const &)>;
+using WriteCompleteCallback = std::function<void(TcpConnectionPtr const &)>;
 using HighWaterMarkCallback
-    = std::function<void(TcpConnection const &, size_t)>;
+    = std::function<void(TcpConnectionPtr const &, size_t)>;
 using MessageCallback
-    = std::function<void(TcpConnection const &, Buffer *, Timestamp)>;
+    = std::function<void(TcpConnectionPtr const &, Buffer *, Timestamp)>;

@@ -1,6 +1,7 @@
 #include "Callbacks.h"
 #include "Timestamp.h"
 #include <asm-generic/socket.h>
+#include <atomic>
 #include <cerrno>
 #include <Channel.h>
 #include <cstddef>
@@ -72,8 +73,9 @@ void TcpConnection::send(std::string const &msg) {
             sendInLoop(msg.c_str(), msg.size());
             // _outputBuffer.retrieveAll();
         } else {
-            _loop->queueInLoop(
-                [this, msg]() { this->sendInLoop(msg.c_str(), msg.size()); });
+            _loop->queueInLoop([this, msg = std::move(msg)]() mutable {
+                this->sendInLoop(msg.data(), msg.size());
+            });
         }
     }
 }
@@ -182,7 +184,8 @@ void TcpConnection::forceClose() {
 }
 
 void TcpConnection::forceCloseInLoop() {
-    if (_state == State::Connected || _state == State::Disconnecting) {
+    if (_state.load(std::memory_order_acquire) == State::Connected
+        || _state.load(std::memory_order_acquire) == State::Disconnecting) {
         handleClose();
     }
 }
@@ -202,7 +205,7 @@ void TcpConnection::startRead() {
 }
 
 void TcpConnection::connectEstablished() {
-    assert(_state == State::Connecting);
+    assert(_state.load(std::memory_order_acquire) == State::Connecting);
     _state = State::Connected;
     _channel->tie(shared_from_this());
     _channel->enableReading();
@@ -210,7 +213,7 @@ void TcpConnection::connectEstablished() {
 }
 
 void TcpConnection::connectDestroyed() {
-    if (_state == State::Connected) {
+    if (_state.load(std::memory_order_acquire) == State::Connected) {
         _state = State::Disconnected;
         _channel->disableAll();
         _connectionCallback(shared_from_this());
@@ -252,7 +255,8 @@ void TcpConnection::handleWrite() {
                         startRead();
                     }
                 }
-                if (_state == State::Disconnecting) {
+                if (_state.load(std::memory_order_acquire)
+                    == State::Disconnecting) {
                     shutdownInLoop();
                 }
             }
@@ -265,9 +269,10 @@ void TcpConnection::handleWrite() {
 }
 
 void TcpConnection::handleClose() {
-    log_trace(
-        "fd = {} state = {}", _channel->fd(), static_cast<int>(_state.load()));
-    assert(_state == State::Connected || _state == State::Disconnecting);
+    log_trace("fd = {} state = {}", _channel->fd(),
+        static_cast<int>(_state.load(std::memory_order_acquire)));
+    assert(_state.load(std::memory_order_acquire) == State::Connected
+           || _state.load(std::memory_order_acquire) == State::Disconnecting);
     _state = State::Disconnected;
     _channel->disableAll();
     TcpConnectionPtr guardThis(shared_from_this());

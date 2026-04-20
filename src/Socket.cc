@@ -35,8 +35,8 @@ int Socket::accept(InetAddress *peeraddr) {
     sockaddr_in6 addr;
     socklen_t addrlen = sizeof(addr);
     bzero(&addr, sizeof addr);
-    int connfd
-        = ::accept(_sockfd, reinterpret_cast<sockaddr *>(&addr), &addrlen);
+    int connfd = ::accept4(_sockfd, reinterpret_cast<sockaddr *>(&addr),
+        &addrlen, SOCK_NONBLOCK | SOCK_CLOEXEC);
     if (connfd > 0) {
         /* 统一用v6来接受对段 */
         peeraddr->setSockAddrInet6(addr);

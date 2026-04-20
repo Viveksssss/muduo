@@ -95,10 +95,8 @@ void TcpServer::newConnection(int sockfd, InetAddress const &peerAddr) {
     log_debug("TcpServer::newConnection [{}] - new connection [{}] from {}",
         _name, connName, peerAddr.toIpPort());
     InetAddress localAddr(getLocalAddr(sockfd));
-    /* TcpConnection(EventLoop *loop, std::string const &name, int sockfd,
-            InetAddress const &localAddr, InetAddress const &peerAddr); */
     TcpConnectionPtr conn = std::make_shared<TcpConnection>(
-        _loop, connName, sockfd, localAddr, peerAddr);
+        ioloop, connName, sockfd, localAddr, peerAddr);
     _connections[connName] = conn;
     conn->setConnectionCallback(_connectionCallback);
     conn->setMessageCallback(_messageCallback);

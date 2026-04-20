@@ -48,7 +48,7 @@ EventLoop *EventLoopThreadPool::getNextLoop() {
         */
         ++_next;
         if (static_cast<size_t>(_next)
-            >= _loops.size()) { /* 基本零开销,预测失败10-20周期 */
+            >= _numThreads) { /* 基本零开销,预测失败10-20周期 */
             _next = 0;
         }
     }

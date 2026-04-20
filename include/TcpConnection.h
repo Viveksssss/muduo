@@ -53,11 +53,11 @@ public:
     }
 
     __attribute__((always_inline)) bool connected() const {
-        return _state == State::Connected;
+        return _state.load(std::memory_order_acquire) == State::Connected;
     }
 
     __attribute__((always_inline)) bool disconnected() const {
-        return _state == State::Disconnected;
+        return _state.load(std::memory_order_acquire) == State::Disconnected;
     }
 
     __attribute__((always_inline)) void setConnectionCallback(

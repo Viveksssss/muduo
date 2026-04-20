@@ -145,6 +145,9 @@ void EventLoop::doPendingFunctors() {
 
     {
         std::lock_guard<std::mutex> lock(_mutex);
+        if (functors.capacity() < _pendingFunctors.size()) {
+            functors.reserve(_pendingFunctors.size());
+        }
         functors.swap(_pendingFunctors);
         /*
             这里直接将待处理的任务移动到局部变量,常量速度

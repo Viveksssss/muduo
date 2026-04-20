@@ -44,7 +44,7 @@ void Channel::handleEvent(Timestamp receiveTime) {
 }
 
 void Channel::handleEventWithGuard(Timestamp receiveTime) {
-    log_info("Channel::handleEventWithGuard revents:%d", _revents);
+    log_info("Channel::handleEventWithGuard revents:{}", _revents);
     if (_revents & EPOLLHUP && !(_revents & EPOLLIN)) {
         if (_closeCallback) {
             _closeCallback();

@@ -69,7 +69,7 @@ TcpConnection::~TcpConnection() {
 void TcpConnection::send(std::string const &msg) {
     if (_state == State::Connected) {
         if (_loop->isInLoopThread()) {
-            sendInLoop(_outputBuffer.peek(), _outputBuffer.readableBytes());
+            sendInLoop(msg.c_str(), msg.size());
             // _outputBuffer.retrieveAll();
         } else {
             _loop->queueInLoop(
@@ -224,7 +224,7 @@ void TcpConnection::handleRead(Timestamp receiveTime) {
     if (n > 0) {
         _messageCallback(shared_from_this(), &_inputBuffer, receiveTime);
     } else if (n == 0) {
-        handleError();
+        handleClose();
     } else {
         errno = saveErrno;
         log_error("TcpConnection::handleRead");

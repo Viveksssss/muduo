@@ -106,7 +106,7 @@ void EpollPoller::update(int operation, Channel *channel) {
     int fd = channel->fd();
     log_trace("func={} op={} fd={} event={}", __func__, operation, fd,
         static_cast<uint32_t>(event.events));
-    if (::epoll_ctl(_epollfd, operation, fd, &event) < 0) {
+    if (::epoll_ctl(_epollfd, operation, fd, &event) < 0) [[unlikely]] {
         if (operation == EPOLL_CTL_DEL) {
             log_error("epoll_ctl op={} fd={} error:{}", operation, fd,
                 std::strerror(errno));

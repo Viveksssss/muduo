@@ -14,11 +14,11 @@ ssize_t Buffer::readFd(int fd, int *saveErrno) {
 
     int const iovcnt = (writeable < sizeof extrabuf) ? 2 : 1;
     ssize_t const n = ::readv(fd, vec, iovcnt);
-    if (n < 0) {
+    if (n < 0) [[unlikely]] {
         *saveErrno = errno;
-    } else if (static_cast<size_t>(n) <= writeable) {
+    } else if (static_cast<size_t>(n) <= writeable) [[likely]] {
         _writerIndex += n;
-    } else {
+    } else [[unlikely]] {
         _writerIndex = _buffer.size();
         append(extrabuf, n - writeable);
     }

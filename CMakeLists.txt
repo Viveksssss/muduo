@@ -8,7 +8,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)  # -fPIC，动态库必需
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-add_compile_options(-O2)
+add_compile_options(-g -O2)
 
 
 # 动态库

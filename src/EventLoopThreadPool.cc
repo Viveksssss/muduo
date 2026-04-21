@@ -40,15 +40,15 @@ void EventLoopThreadPool::start(ThreadInitCallback const &cb) {
 EventLoop *EventLoopThreadPool::getNextLoop() {
     assert(_started);
     EventLoop *loop = _baseLoop;
-    if (!_loops.empty()) {
+    if (!_loops.empty()) [[likely]] {
         loop = _loops[_next];
         /*
             _next = (_next + 1) % _numThreads;
             // 除法是 CPU最慢的基本运算之一, 20-30周期
         */
         ++_next;
-        if (static_cast<size_t>(_next)
-            >= _numThreads) { /* 基本零开销,预测失败10-20周期 */
+        if (static_cast<size_t>(_next) >= _numThreads)
+            [[unlikely]] { /* 基本零开销,预测失败10-20周期 */
             _next = 0;
         }
     }

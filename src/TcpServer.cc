@@ -55,6 +55,7 @@ TcpServer::TcpServer(EventLoop *loop, InetAddress const &listenAddr,
     : _loop(CHECK_NOTNULL(loop))
     , _ipPort(listenAddr.toIpPort())
     , _name(name)
+    , _listenAddr(listenAddr)
     , _acceptor(std::make_unique<Acceptor>(
           loop, listenAddr, option == Option::ReusePort))
     , _threadPool(std::make_shared<EventLoopThreadPool>(_loop, _name))
@@ -94,7 +95,7 @@ void TcpServer::newConnection(int sockfd, InetAddress const &peerAddr) {
 
     log_debug("TcpServer::newConnection [{}] - new connection [{}] from {}",
         _name, connName, peerAddr.toIpPort());
-    InetAddress localAddr(getLocalAddr(sockfd));
+    InetAddress localAddr(_listenAddr);
     TcpConnectionPtr conn = std::make_shared<TcpConnection>(
         ioloop, connName, sockfd, localAddr, peerAddr);
     _connections[connName] = conn;

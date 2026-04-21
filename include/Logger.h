@@ -6,6 +6,8 @@
 #include <source_location>
 #include <string>
 
+#define LOG_ENABLED false
+
 #define FOREACH_LOG_LEVEL(f)                                                   \
     f(trace) f(debug) f(info) f(critical) f(warning) f(error) f(fatal)
 
@@ -89,12 +91,11 @@ inline void output_log(
     if (g_log_file) {
         g_log_file << msg + '\n';
     }
-    if (lev >= g_max_level) {
-        std::cout << LOG_IF_HAS_ANSI_COLORS(
-                         k_level_ansi_colors[(std::uint8_t)lev] +)
-                             msg LOG_IF_HAS_ANSI_COLORS(+k_reset_ansi_color)
-                         + '\n';
-    }
+
+    std::cout << LOG_IF_HAS_ANSI_COLORS(
+                     k_level_ansi_colors[(std::uint8_t)lev] +)
+                         msg LOG_IF_HAS_ANSI_COLORS(+k_reset_ansi_color)
+                     + '\n';
 }
 
 template <typename T>
@@ -126,6 +127,9 @@ template <typename... Args>
 void log(log_level lev,
     details::with_source_location<std::format_string<Args...>> fmt,
     Args &&...args) {
+    if (lev < details::g_max_level) [[likely]] {
+        return;
+    }
     auto const &loc = fmt.location();
     // TODO:
     auto format
@@ -136,13 +140,19 @@ void log(log_level lev,
     }
 }
 
+// 修改宏定义，在宏层面检查级别
 #define _FUNCTION(name)                                                        \
     template <typename... Args>                                                \
     void log_##name(                                                           \
         details::with_source_location<std::format_string<Args...>> fmt,        \
         Args &&...args) {                                                      \
-        return log(                                                            \
-            log_level::name, std::move(fmt), std::forward<Args>(args)...);     \
+        if constexpr (LOG_ENABLED) {                                           \
+            if (log_level::name < details::g_max_level) [[likely]] {           \
+                return;                                                        \
+            }                                                                  \
+            return log(                                                        \
+                log_level::name, std::move(fmt), std::forward<Args>(args)...); \
+        }                                                                      \
     }
 FOREACH_LOG_LEVEL(_FUNCTION)
 #undef _FUNCTION

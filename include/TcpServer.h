@@ -66,6 +66,7 @@ private:
     EventLoop *_loop;                                 /* baseLoop */
     std::string const _ipPort;                        /* ipport127.0.0.1:9999 */
     std::string const _name;                          /* 服务器实例名称 */
+    InetAddress const _listenAddr;                    /* 监听地址 */
     std::unique_ptr<Acceptor> _acceptor;              /* 接受新的连接 */
     std::shared_ptr<EventLoopThreadPool> _threadPool; /* loop池 */
     ConnectionCallback _connectionCallback;           /* 连接/断开连接回调 */

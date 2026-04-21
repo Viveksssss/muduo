@@ -31,7 +31,7 @@ void Channel::remove() {
 void Channel::handleEvent(Timestamp receiveTime) {
     std::shared_ptr<void> guard;
     /* 由TcpConnection绑定,所以需要确定对象是否存在 */
-    if (_tied) {
+    if (_tied) [[likely]] {
         guard = _tie.lock();
         if (guard) {
             handleEventWithGuard(receiveTime);

@@ -41,7 +41,7 @@ void Acceptor::listen() {
 void Acceptor::handleRead() {
     InetAddress peerAddr;
     int connfd = _acceptSocket.accept(&peerAddr);
-    if (connfd >= 0) {
+    if (connfd >= 0) [[likely]] {
         if (_newConnectionCallback) {
             _newConnectionCallback(connfd, peerAddr);
         } else {

@@ -9,7 +9,7 @@ namespace {
 
 thread_local EventLoop *t_loopInThisThread = nullptr;
 
-int const kPollTimeMs = 10000; /* 默认超时时间 */
+int const kPollTimeMs = 1000; /* 默认超时时间 */
 
 int createEventfd() {
     int evtfd = ::eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC);
@@ -134,7 +134,7 @@ bool EventLoop::hasChannel(Channel *channel) {
 void EventLoop::handleRead() {
     uint64_t one = 1;
     ssize_t n = ::read(_wakeupFd, &one, sizeof one);
-    if (n != sizeof one) {
+    if (n != sizeof one) [[unlikely]] {
         log_error("EventLoop::handleRead() reads {} bytes instead of 8", n);
     }
 }
@@ -145,7 +145,7 @@ void EventLoop::doPendingFunctors() {
 
     {
         std::lock_guard<std::mutex> lock(_mutex);
-        if (functors.capacity() < _pendingFunctors.size()) {
+        if (functors.capacity() < _pendingFunctors.size()) [[unlikely]] {
             functors.reserve(_pendingFunctors.size());
         }
         functors.swap(_pendingFunctors);

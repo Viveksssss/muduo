@@ -104,7 +104,7 @@ void TcpConnection::sendInLoop(void const *data, size_t len) {
             }
         } else /* error */ {
             nwrote = 0;
-            if (errno != EWOULDBLOCK || errno != EAGAIN) {
+            if (errno != EWOULDBLOCK && errno != EAGAIN) {
                 log_error("TcpConnection::sendInLoop");
                 if (errno == EPIPE || errno == ECONNRESET) {
                     faultError = true;
@@ -134,7 +134,7 @@ void TcpConnection::sendInLoop(void const *data, size_t len) {
                 });
         }
         _outputBuffer.append(
-            static_cast<char const *>(data) + nwrote, old_len + remaining);
+            static_cast<char const *>(data) + nwrote, remaining);
         if (!_channel->isWriting()) {
             _channel->enableWriting();
         }

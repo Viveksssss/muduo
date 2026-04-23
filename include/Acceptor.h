@@ -3,7 +3,7 @@
 #include "Channel.h"
 #include "EventLoop.h"
 #include "InetAddress.h"
-#include "noncapyable.h"
+#include "noncopyable.h"
 #include "Socket.h"
 
 // clang-format off

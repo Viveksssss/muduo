@@ -4,7 +4,7 @@
 #include <functional>
 #include <latch>
 #include <memory>
-#include <noncapyable.h>
+#include <noncopyable.h>
 #include <thread>
 #include <unistd.h>
 
@@ -22,7 +22,7 @@ public:
         return _started;
     }
 
-    __attribute__((always_inline)) pid_t tid() const noexcept{
+    __attribute__((always_inline)) pid_t tid() const noexcept {
         return _tid;
     }
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "noncapyable.h"
+#include "noncopyable.h"
 #include "Timestamp.h"
 #include <unordered_map>
 #include <vector>

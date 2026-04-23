@@ -2,7 +2,7 @@
 #include "Thread.h"
 #include <condition_variable>
 #include <functional>
-#include <noncapyable.h>
+#include <noncopyable.h>
 
 class EventLoop;
 

@@ -2,7 +2,7 @@
 
 #include "EventLoopThread.h"
 #include <functional>
-#include <noncapyable.h>
+#include <noncopyable.h>
 #include <string>
 
 class EventLoop;

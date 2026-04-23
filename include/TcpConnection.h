@@ -5,7 +5,7 @@
 #include <Callbacks.h>
 #include <InetAddress.h>
 #include <memory>
-#include <noncapyable.h>
+#include <noncopyable.h>
 #include <string>
 #include <sys/types.h>
 #include <Timestamp.h>

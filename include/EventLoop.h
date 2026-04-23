@@ -5,7 +5,7 @@
 #include <CurrentThread.h>
 #include <functional>
 #include <memory>
-#include <noncapyable.h>
+#include <noncopyable.h>
 #include <Timestamp.h>
 
 class Channel;

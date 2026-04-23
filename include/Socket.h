@@ -1,7 +1,7 @@
 #pragma once
 
 #include "InetAddress.h"
-#include "noncapyable.h"
+#include "noncopyable.h"
 
 class Socket : noncopyable {
 public:

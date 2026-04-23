@@ -4,7 +4,7 @@
  * @brief Channel通道,封装了socketfd和事件类型,以及事件发生后的回调操作
  *
  */
-#include "noncapyable.h"
+#include "noncopyable.h"
 #include <functional>
 #include <memory>
 #include <Timestamp.h>

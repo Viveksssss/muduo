@@ -7,7 +7,7 @@
 #include <EventLoopThreadPool.h>
 #include <InetAddress.h>
 #include <memory>
-#include <noncapyable.h>
+#include <noncopyable.h>
 #include <string>
 #include <TcpConnection.h>
 #include <unordered_map>

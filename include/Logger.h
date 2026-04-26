@@ -1,3 +1,5 @@
+#pragma once
+
 #include <chrono>
 #include <cstdint>
 #include <format>
@@ -6,10 +8,17 @@
 #include <source_location>
 #include <string>
 
-#define LOG_ENABLED false
+extern bool g_log_enabled;
 
-#define FOREACH_LOG_LEVEL(f)                                                   \
-    f(trace) f(debug) f(info) f(critical) f(warning) f(error) f(fatal)
+static inline constexpr void log_start() {
+    g_log_enabled = true;
+}
+
+static inline constexpr void log_stop() {
+    g_log_enabled = false;
+}
+
+#define FOREACH_LOG_LEVEL(f) f(trace) f(debug) f(info) f(critical) f(warning) f(error) f(fatal)
 
 enum class log_level : std::uint8_t {
 #define _FUNCTION(x) x,
@@ -21,7 +30,7 @@ namespace details {
 
 inline std::string log_level_name(log_level lev) {
     switch (lev) {
-#define _FUNCTION(name)                                                        \
+#define _FUNCTION(name)                                                                            \
     case log_level::name: return #name;
         FOREACH_LOG_LEVEL(_FUNCTION)
 #undef _FUNCTION
@@ -30,8 +39,8 @@ inline std::string log_level_name(log_level lev) {
 }
 
 inline log_level log_level_from_name(std::string const &name) {
-#define _FUNCTION(lev)                                                         \
-    if (name == #lev)                                                          \
+#define _FUNCTION(lev)                                                                             \
+    if (name == #lev)                                                                              \
         return log_level::lev;
     FOREACH_LOG_LEVEL(_FUNCTION)
 #undef _FUNCTION
@@ -39,30 +48,28 @@ inline log_level log_level_from_name(std::string const &name) {
 }
 
 #if (__linux__) || defined(__APPLE__)
-inline constexpr char k_level_ansi_colors[(std::uint8_t)log_level::fatal + 1][8]
-    = {
-        "\033[37m",
-        "\033[35m",
-        "\033[32m",
-        "\033[34m",
-        "\033[33m",
-        "\033[31m",
-        "\033[31;1m",
+inline constexpr char k_level_ansi_colors[(std::uint8_t)log_level::fatal + 1][8] = {
+    "\033[37m",
+    "\033[35m",
+    "\033[32m",
+    "\033[34m",
+    "\033[33m",
+    "\033[31m",
+    "\033[31;1m",
 };
 
 inline constexpr char k_reset_ansi_color[4] = "\033[m";
 # define LOG_IF_HAS_ANSI_COLORS(x) x
 #else
 # define LOG_IF_HAS_ANSI_COLORS(x) x
-inline constexpr char k_level_ansi_colors[(std::uint8_t)log_level::fatal + 1][1]
-    = {
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
-        "",
+inline constexpr char k_level_ansi_colors[(std::uint8_t)log_level::fatal + 1][1] = {
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
 };
 
 inline constexpr char k_reset_ansi_color[1] = "";
@@ -82,20 +89,17 @@ inline std::ofstream g_log_file = []() -> std::ofstream {
     return std::ofstream();
 }();
 
-inline void output_log(
-    log_level lev, std::string msg, std::source_location const &loc) {
-    std::chrono::zoned_time now{
-        std::chrono::current_zone(), std::chrono::system_clock::now()};
-    msg = std::format("{} {}:{} [{}] {}", now, loc.file_name(), loc.line(),
-        log_level_name(lev), msg);
+inline void output_log(log_level lev, std::string msg, std::source_location const &loc) {
+    std::chrono::zoned_time now{std::chrono::current_zone(), std::chrono::system_clock::now()};
+    msg = std::format(
+        "{} {}:{} [{}] {}", now, loc.file_name(), loc.line(), log_level_name(lev), msg);
     if (g_log_file) {
         g_log_file << msg + '\n';
     }
 
-    std::cout << LOG_IF_HAS_ANSI_COLORS(
-                     k_level_ansi_colors[(std::uint8_t)lev] +)
-                         msg LOG_IF_HAS_ANSI_COLORS(+k_reset_ansi_color)
-                     + '\n';
+    std::cout << LOG_IF_HAS_ANSI_COLORS(k_level_ansi_colors[(std::uint8_t)lev] +)
+            msg LOG_IF_HAS_ANSI_COLORS(+k_reset_ansi_color)
+              << std::endl;
 }
 
 template <typename T>
@@ -124,16 +128,14 @@ public:
 } // namespace details
 
 template <typename... Args>
-void log(log_level lev,
-    details::with_source_location<std::format_string<Args...>> fmt,
-    Args &&...args) {
+void log(
+    log_level lev, details::with_source_location<std::format_string<Args...>> fmt, Args &&...args) {
     if (lev < details::g_max_level) [[likely]] {
         return;
     }
     auto const &loc = fmt.location();
     // TODO:
-    auto format
-        = std::vformat(fmt.format().get(), std::make_format_args(args...));
+    auto format = std::vformat(fmt.format().get(), std::make_format_args(args...));
     details::output_log(lev, std::move(format), loc);
     if (lev == log_level::fatal) {
         std::abort();
@@ -141,18 +143,16 @@ void log(log_level lev,
 }
 
 // 修改宏定义，在宏层面检查级别
-#define _FUNCTION(name)                                                        \
-    template <typename... Args>                                                \
-    void log_##name(                                                           \
-        details::with_source_location<std::format_string<Args...>> fmt,        \
-        Args &&...args) {                                                      \
-        if constexpr (LOG_ENABLED) {                                           \
-            if (log_level::name < details::g_max_level) [[likely]] {           \
-                return;                                                        \
-            }                                                                  \
-            return log(                                                        \
-                log_level::name, std::move(fmt), std::forward<Args>(args)...); \
-        }                                                                      \
+#define _FUNCTION(name)                                                                            \
+    template <typename... Args>                                                                    \
+    void log_##name(                                                                               \
+        details::with_source_location<std::format_string<Args...>> fmt, Args &&...args) {          \
+        if (g_log_enabled) {                                                                       \
+            if (log_level::name < details::g_max_level) [[likely]] {                               \
+                return;                                                                            \
+            }                                                                                      \
+            return log(log_level::name, std::move(fmt), std::forward<Args>(args)...);              \
+        }                                                                                          \
     }
 FOREACH_LOG_LEVEL(_FUNCTION)
 #undef _FUNCTION

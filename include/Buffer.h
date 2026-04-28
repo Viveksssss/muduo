@@ -12,8 +12,10 @@
     @endcode
 
 */
+#include <algorithm>
 #include <cassert>
 #include <cstddef>
+#include <cstring>
 #include <string>
 #include <vector>
 
@@ -35,8 +37,7 @@ public:
         return _buffer.size() - _writerIndex;
     }
 
-    __attribute__((__always_inline__)) size_t
-    prependableBytes() const noexcept {
+    __attribute__((__always_inline__)) size_t prependableBytes() const noexcept {
         return _readerIndex;
     }
 
@@ -44,6 +45,36 @@ public:
         ensureWriteableBytes(len);
         std::copy(data, data + len, beginWrite());
         _writerIndex += len;
+    }
+
+    void append(std::string const &str) {
+        append(str.data(), str.size());
+    }
+
+    char const *findCRLF() const {
+        char const pattern[] = "\r\n";
+        char const *crlf = std::search(peek(), beginWrite(), pattern, pattern + 2);
+        return crlf == beginWrite() ? nullptr : crlf;
+    }
+
+    char const *findCRLF(char const *start) const {
+        assert(peek() <= start);
+        assert(start <= beginWrite());
+        char const pattern[] = "\r\n";
+        char const *crlf = std::search(start, beginWrite(), pattern, pattern + 2);
+        return crlf == beginWrite() ? nullptr : crlf;
+    }
+
+    char const *findEOL() const {
+        void const *eol = memchr(peek(), '\n', readableBytes());
+        return static_cast<char const *>(eol);
+    }
+
+    char const *findEOF(char *const start) const {
+        assert(peek() <= start);
+        assert(start <= beginWrite());
+        void *eol = memchr(start, '\n', beginWrite() - start);
+        return static_cast<char const *>(eol);
     }
 
     /* 从fd读取数据 */
@@ -81,6 +112,12 @@ public:
         }
     }
 
+    __attribute__((__always_inline__)) void retrieveUntil(char const *end) {
+        assert(peek() <= end);
+        assert(end <= beginWrite());
+        retrieve(end - peek());
+    }
+
     __attribute__((__always_inline__)) void retrieveAll() {
         _readerIndex = CheapPrepend;
         _writerIndex = CheapPrepend;
@@ -90,8 +127,7 @@ public:
         return retrieveAsString(readableBytes());
     }
 
-    __attribute__((__always_inline__)) std::string retrieveAsString(
-        size_t len) noexcept {
+    __attribute__((__always_inline__)) std::string retrieveAsString(size_t len) noexcept {
         assert(len <= readableBytes());
         std::string result(peek(), len);
         retrieve(len);
@@ -119,8 +155,7 @@ private:
         } else {
             assert(CheapPrepend < _readerIndex);
             size_t readable = readableBytes();
-            std::copy(begin() + _readerIndex, begin() + _writerIndex,
-                begin() + CheapPrepend);
+            std::copy(begin() + _readerIndex, begin() + _writerIndex, begin() + CheapPrepend);
 
             _readerIndex = CheapPrepend;
             _writerIndex = _readerIndex + readable;

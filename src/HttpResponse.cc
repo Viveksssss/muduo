@@ -1,5 +1,10 @@
 #include "HttpResponse.h"
 
+HttpResponse::HttpResponse(bool close)
+    : _statusCode(Unknown)
+    , _closeConnection(close)
+    , _async(false) { }
+
 void HttpResponse::appendToBuffer(Buffer *output) const {
     char buf[32];
     snprintf(buf, sizeof(buf), "HTTP/1.1 %d ", _statusCode);

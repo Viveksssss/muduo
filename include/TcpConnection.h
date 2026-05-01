@@ -14,8 +14,7 @@ class EventLoop;
 class Channel;
 class Socket;
 
-class TcpConnection : noncopyable,
-                      public std::enable_shared_from_this<TcpConnection> {
+class TcpConnection : noncopyable, public std::enable_shared_from_this<TcpConnection> {
 public:
     TcpConnection(EventLoop *loop, std::string const &name, int sockfd,
         InetAddress const &localAddr, InetAddress const &peerAddr);
@@ -23,6 +22,7 @@ public:
     ~TcpConnection();
 
     void send(std::string const &msg);
+    void send(Buffer *buf);
 
     void shutdown();
 
@@ -60,23 +60,19 @@ public:
         return _state.load(std::memory_order_acquire) == State::Disconnected;
     }
 
-    __attribute__((always_inline)) void setConnectionCallback(
-        ConnectionCallback const &cb) {
+    __attribute__((always_inline)) void setConnectionCallback(ConnectionCallback const &cb) {
         _connectionCallback = cb;
     }
 
-    __attribute__((always_inline)) void setMessageCallback(
-        MessageCallback const &cb) {
+    __attribute__((always_inline)) void setMessageCallback(MessageCallback const &cb) {
         _messageCallback = cb;
     }
 
-    __attribute__((always_inline)) void setCloseCallback(
-        CloseCallback const &cb) {
+    __attribute__((always_inline)) void setCloseCallback(CloseCallback const &cb) {
         _closeCallback = cb;
     }
 
-    __attribute__((always_inline)) void setWriteCompleteCallback(
-        WriteCompleteCallback const &cb) {
+    __attribute__((always_inline)) void setWriteCompleteCallback(WriteCompleteCallback const &cb) {
         _writeCompleteCallback = cb;
     }
 
@@ -84,6 +80,14 @@ public:
         HighWaterMarkCallback const &cb, size_t mark) {
         _highWaterMarkCallback = cb;
         _highWaterMark = mark;
+    }
+
+    __attribute__((always_inline)) void setContext(std::shared_ptr<void> const &context) {
+        _context = context;
+    }
+
+    __attribute__((always_inline)) std::shared_ptr<void> const &getContext() const {
+        return _context;
     }
 
 private:
@@ -122,4 +126,6 @@ private:
 
     Buffer _inputBuffer;
     Buffer _outputBuffer;
+
+    std::shared_ptr<void> _context;
 };

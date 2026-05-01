@@ -31,6 +31,10 @@ public:
         this->_version = v;
     }
 
+    __attribute__((always_inline)) Version getVersion() const {
+        return _version;
+    }
+
     bool setMethod(std::string const &m);
     bool setMethod(char const *start, char const *end);
 
@@ -126,6 +130,14 @@ public:
     __attribute__((always_inline)) void setPathParam(
         std::string const &name, std::string const &value) {
         _pathParams[name] = value;
+    }
+
+    __attribute__((always_inline)) void clearBody() {
+        _body.clear();
+    }
+
+    __attribute__((always_inline)) size_t bodySize() const {
+        return _body.size();
     }
 
     static std::string urlDecode(std::string const &str);

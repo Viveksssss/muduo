@@ -161,12 +161,37 @@ bool HttpContext::processBody(Buffer *buf) {
         return false;
     } else {
         size_t readable = buf->readableBytes();
-        size_t toRead = std::min(readable, remainingLength());
+        size_t remaining = remainingLength();
+
+        // 自适应单次处理量
+        size_t limit;
+        if (remaining <= 1024 * 1024) {
+            // 小文件：一次读完剩余内容
+            limit = remaining;
+        } else if (remaining <= 10 * 1024 * 1024) {
+            // 中等文件：一次读 1MB
+            limit = 1024 * 1024;
+        } else {
+            // 大文件：一次读 16MB
+            limit = 16UL * 1024 * 1024;
+        }
+
+        size_t toRead = std::min({readable, remaining, limit});
+
         if (toRead > 0) {
             _request.appendToBody(buf->peek(), toRead);
             _bodyReceived += toRead;
             buf->retrieve(toRead);
         }
+
         return _bodyReceived >= _contentLength;
+
+        // size_t toRead = std::min(readable, remainingLength());
+        // if (toRead > 0) {
+        //     _request.appendToBody(buf->peek(), toRead);
+        //     _bodyReceived += toRead;
+        //     buf->retrieve(toRead);
+        // }
+        // return _bodyReceived >= _contentLength;
     }
 }

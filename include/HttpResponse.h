@@ -38,6 +38,10 @@ public:
         _closeConnection = on;
     }
 
+    __attribute__((always_inline)) bool closeConnection() const {
+        return _closeConnection;
+    }
+
     __attribute__((always_inline)) void setContentType(std::string const &contentType) {
         addHeader("Content-Type", contentType);
     }

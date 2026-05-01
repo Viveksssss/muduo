@@ -7,7 +7,7 @@ Timestamp::Timestamp() : _microSecondsSinceEpoch(0) { }
 
 Timestamp::Timestamp(int64_t microSecondsSinceEpoch)
     : _microSecondsSinceEpoch(microSecondsSinceEpoch) { }
-
+    
 std::string Timestamp::toString() const {
     return std::to_string(_microSecondsSinceEpoch);
 }

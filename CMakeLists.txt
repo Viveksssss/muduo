@@ -12,7 +12,8 @@ add_compile_options(-g -O2)
 
 
 # 动态库
-aux_source_directory(./src SRC_LIST)
+# aux_source_directory(./src SRC_LIST)
+file(GLOB SRC_LIST ./src/*.cc )
 add_library(muduo SHARED ${SRC_LIST})
 target_link_libraries(muduo pthread)
 target_include_directories(muduo PUBLIC

@@ -10,11 +10,11 @@
 
 extern bool g_log_enabled;
 
-static inline constexpr void log_start() {
+static inline void log_start() {
     g_log_enabled = true;
 }
 
-static inline constexpr void log_stop() {
+static inline void log_stop() {
     g_log_enabled = false;
 }
 

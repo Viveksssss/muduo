@@ -5,6 +5,7 @@
 #include <CurrentThread.h>
 #include <functional>
 #include <memory>
+#include <mutex>
 #include <noncopyable.h>
 #include <Timestamp.h>
 
@@ -41,20 +42,20 @@ private:
 private:
     using ChannelList = std::vector<Channel *>;
 
-    std::atomic<bool> _looping;      /* 是否正在事件循环 */
-    std::atomic<bool> _quit;         /* 是否退出事件循环 */
-    pid_t const _threadId;           /* 事件循环所在的线程ID */
-    Timestamp _pollReturnTime;       /* 上一次调用poll()返回的时间点 */
-    std::unique_ptr<Poller> _poller; /* 事件循环使用的Poller */
+    std::atomic<bool> _looping;                /* 是否正在事件循环 */
+    std::atomic<bool> _quit;                   /* 是否退出事件循环 */
+    pid_t const _threadId;                     /* 事件循环所在的线程ID */
+    Timestamp _pollReturnTime;                 /* 上一次调用poll()返回的时间点 */
+    std::unique_ptr<Poller> _poller;           /* 事件循环使用的Poller */
 
-    int _wakeupFd;                   /* eventfd, 用于唤醒事件循环所在的线程 */
+    int _wakeupFd;                             /* eventfd, 用于唤醒事件循环所在的线程 */
     std::unique_ptr<Channel> _wakeupChannel;   /* 用于监视_wakeupFd的Channel */
     Channel *_currentActiveChannel;            /* 当前正在处理的Channel */
     ChannelList _activeChannels;               /* 活跃的Channel列表 */
 
     std::vector<Functor> _pendingFunctors;     /* 待执行的函数列表 */
     std::atomic<bool> _callingPendingFunctors; /* 是否正在调用待处理的函数 */
-    mutable std::mutex _mutex; /* 保护_pendingFunctors的互斥锁 */
+    mutable std::mutex _mutex;                 /* 保护_pendingFunctors的互斥锁 */
 };
 
 // clang-format off

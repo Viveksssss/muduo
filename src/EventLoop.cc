@@ -4,6 +4,7 @@
 #include <Logger.h>
 #include <Poller.h>
 #include <sys/eventfd.h>
+#include <unistd.h>
 
 namespace {
 
@@ -34,8 +35,7 @@ EventLoop::EventLoop()
     , _pendingFunctors()
     , _callingPendingFunctors(false)
     , _mutex() {
-    log_trace("EventLoop created {} in thread %d", static_cast<void *>(this),
-        _threadId);
+    log_trace("EventLoop created {} in thread %d", static_cast<void *>(this), _threadId);
     if (t_loopInThisThread) {
         log_fatal("Another EventLoop {} exists in this thread {}",
             static_cast<void *>(t_loopInThisThread), _threadId);
@@ -49,8 +49,7 @@ EventLoop::EventLoop()
 }
 
 EventLoop::~EventLoop() {
-    log_debug("EventLoop {} of thread {} destructs", static_cast<void *>(this),
-        _threadId);
+    log_debug("EventLoop {} of thread {} destructs", static_cast<void *>(this), _threadId);
 
     _wakeupChannel->disableAll();
     _wakeupChannel->remove();

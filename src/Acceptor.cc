@@ -2,10 +2,10 @@
 #include <Acceptor.h>
 #include <Logger.h>
 #include <sys/socket.h>
+#include <unistd.h>
 
 static int createNonblocking(sa_family_t family) {
-    int sockfd = ::socket(
-        family, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC, IPPROTO_TCP);
+    int sockfd = ::socket(family, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC, IPPROTO_TCP);
     if (sockfd < 0) {
         log_fatal("createNonblocking error");
     }

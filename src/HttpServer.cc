@@ -68,7 +68,6 @@ void HttpServer::OnMessage(TcpConnectionPtr const &conn, Buffer *buf, Timestamp 
                 }
             }
         }
-
     } else if (result == HttpContext::ParseResult::GotRequest) {
         bool syncProcessed = OnRequest(conn, context->request());
         if (syncProcessed) {

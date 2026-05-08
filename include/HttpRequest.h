@@ -25,7 +25,19 @@ public:
         Http11
     };
 
-    HttpRequest() : _method(Method::Invalid), _version(Version::Unknown) { }
+    static std::string methodToString(Method method) {
+        switch (method) {
+        case Method::Get:    return "GET";
+        case Method::Post:   return "POST";
+        case Method::Head:   return "HEAD";
+        case Method::Put:    return "PUT";
+        case Method::Delete: return "DELETE";
+        default:             return "INVALID";
+        }
+    }
+
+    HttpRequest() : _method(Method::Invalid), _version(Version::Unknown) {
+    }
 
     __attribute__((always_inline)) void setVersion(Version v) {
         this->_version = v;

@@ -54,41 +54,22 @@ void HttpServer::OnMessage(TcpConnectionPtr const &conn, Buffer *buf, Timestamp 
     if (result == HttpContext::ParseResult::HeadersComplete) {
         log_info("Headers complete, waiting for body if needed");
     } else if (result == HttpContext::ParseResult::NeedMore) {
-        // if (context->expectBody()
-        //     || context->state() == HttpContext::HttpRequestParseState::ExpectBody) {
-        //     HttpRequest &req = context->request();
-        //     size_t bufSize = req.body().size();
-        //     if (bufSize >= 1024 * 1024) {
-        //         log_info("Stringing chunk:{}bytes", bufSize);
-        //         HttpResponse response(false);
-        //         bool syncProcessed = _httpCallback(conn, req, &response);
-        //         if (!syncProcessed) {
-        //             log_info("Async request,waiting for callback");
-        //             return;
-        //         } else {
-        //             log_info("Sync request completed");
-        //             req.clearBody();
-        //         }
-        //     }
-        // }
-
-        // HttpRequest &req = context->request();
-        // HttpResponse response(false); // 短连接或长连接由业务设置
-
-        // bool syncProcessed = _httpCallback(conn, req, &response);
-
-        // if (!syncProcessed) {
-        //     // 业务返回 false：需要异步等待更多数据
-        //     // 此时不能关闭连接，不能清空上下文，直接返回等待下一次 OnMessage
-        //     log_info("Async request, waiting for more data");
-        //     return;
-        // } else {
-        //     // 业务返回 true：请求已处理完毕（例如上传完成、参数错误等）
-        //     // 清空请求体，重置上下文，准备接收下一个请求
-        //     log_info("Sync request completed during streaming");
-        //     req.clearBody();
-        //     context->reset();
-        // }
+        if (context->expectBody()
+            || context->state() == HttpContext::HttpRequestParseState::ExpectBody) {
+            HttpRequest &req = context->request();
+            size_t bufSize = req.body().size();
+            if (bufSize >= 1024 * 1024) {
+                log_info("Stringing chunk:{}bytes", bufSize);
+                HttpResponse response(false);
+                bool syncProcessed = _httpCallback(conn, req, &response);
+                if (!syncProcessed) {
+                    log_info("Async request,waiting for callback");
+                    return;
+                } else {
+                    log_info("Sync request completed");
+                }
+            }
+        }
     } else if (result == HttpContext::ParseResult::GotRequest) {
         bool syncProcessed = OnRequest(conn, context->request());
         if (syncProcessed) {

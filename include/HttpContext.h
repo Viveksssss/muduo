@@ -3,12 +3,9 @@
 #include "Buffer.h"
 #include "copyable.h"
 #include "HttpRequest.h"
-#include "HttpResponse.h"
-#include "Logger.h"
 #include "Timestamp.h"
 #include <cstdint>
 #include <memory>
-#include <unordered_map>
 
 class HttpContext : public copyable {
 public:
